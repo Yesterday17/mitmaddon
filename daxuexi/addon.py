@@ -16,7 +16,7 @@ class daxuexi:
         self.regex_inject = re.compile("'([^']+学习[^']+)'")
 
         # 动画跳转到结束
-        self.regex_end = re.compile('setTimeout\(function\(\) {(?:.|\n)+?\}, 1000\);')
+        self.regex_end = re.compile('setTimeout\(function\(\) {(?:.|\n)+?\}, 1[05]00\);')
 
     def request(self, flow: http.HTTPFlow):
         if flow.request.host.__eq__('h5.cyol.com'):
@@ -43,9 +43,18 @@ class daxuexi:
                 body = self.regex_inject.sub(title, body)  # 替换所有分享标题
 
             # 直接过场到结束
-            append = '<script>'
+            append = ''
             for match in self.regex_end.finditer(body):
                 append = match.group(0)
             append = '\n<script>\n' + append + '\n</script>'
+
+            # 直接显示结束图片
+            append += '''
+<style>
+div.section3 {
+  opacity: inherit;
+  z-index: 114514;
+}
+</style>'''
 
             flow.response.text = body + append
